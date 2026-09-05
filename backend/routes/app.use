@@ -1,0 +1,2 @@
+const shopRoutes = require('./routes/shop');
+app.use('/api/shop', shopRoutes);

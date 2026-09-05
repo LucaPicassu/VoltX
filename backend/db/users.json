@@ -1,0 +1,19 @@
+[
+  {
+    "id": "2df28e35-a195-4338-b1f8-6e2aae3019f9",
+    "username": "LucaPicassu",
+    "email": "lucaseebacher161209@gmail.com",
+    "password": "$2a$10$shR7uDRCjgcUjDrCYq57Te932ck5s.aptjXkW6pwEBhZqIeRAV0UW",
+    "voltCoins": 9999,
+    "createdAt": "2026-09-05T03:17:56.280Z",
+    "profile": {
+      "bio": "⚡ VoltX Admin",
+      "avatar": "",
+      "lastNameChange": null,
+      "lastDailyBonus": null,
+      "totalBonus": 0,
+      "lastActivity": "2026-09-05T03:17:58.347Z"
+    },
+    "transactions": []
+  }
+]
