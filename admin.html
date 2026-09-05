@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoltX – Admin Panel</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+    body {
+      min-height:100vh;
+      background: radial-gradient(circle at 30% 20%, #0e0b2a, #04030e);
+      padding:1.5rem;
+      color:#f0eeff;
+    }
+    .admin-container {
+      max-width:1400px;
+      margin:0 auto;
+    }
+    .header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:1rem 2rem;
+      background:rgba(16,14,40,0.78);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(120,80,255,0.3);
+      border-radius:40px;
+      margin-bottom:2rem;
+      flex-wrap:wrap;
+      gap:1rem;
+    }
+    .brand { font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,#a78bfa,#7c3aed,#4f46e5); -webkit-background-clip:text; background-clip:text; color:transparent; cursor:pointer; }
+    .brand:hover { opacity:0.8; }
+    .header-info { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
+    .header-info .admin-badge { background:#7c3aed; padding:4px 16px; border-radius:40px; font-size:0.85rem; font-weight:700; }
+    .btn-logout { background:#ef4444; border:none; color:white; padding:8px 20px; border-radius:40px; cursor:pointer; font-weight:600; transition:0.25s; }
+    .btn-logout:hover { background:#dc2626; transform:scale(1.05); }
+
+    .dashboard-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+      gap:1.5rem;
+      margin-bottom:2rem;
+    }
+    .stat-card {
+      background:rgba(10,8,30,0.6);
+      border:1px solid #2a235a;
+      border-radius:24px;
+      padding:1.5rem;
+      text-align:center;
+      transition:0.25s;
+    }
+    .stat-card:hover { border-color:#7c3aed; transform:translateY(-4px); }
+    .stat-card .label { font-size:0.8rem; color:#9ca3cf; text-transform:uppercase; letter-spacing:0.5px; }
+    .stat-card .value { font-size:2.2rem; font-weight:800; margin-top:6px; background:linear-gradient(135deg,#a78bfa,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+    .admin-section {
+      background:rgba(10,8,30,0.6);
+      border:1px solid #2a235a;
+      border-radius:28px;
+      padding:1.5rem 2rem;
+      margin-bottom:2rem;
+    }
+    .admin-section h3 { margin-bottom:1.5rem; color:#a78bfa; display:flex; align-items:center; gap:10px; }
+    .admin-section h3 span { font-size:1.5rem; }
+
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    th { text-align:left; padding:10px 12px; color:#9ca3cf; font-weight:600; border-bottom:2px solid #2a235a; }
+    td { padding:10px 12px; border-bottom:1px solid #1a1540; }
+    tr:hover { background:rgba(124,58,237,0.05); }
+
+    .btn-sm { padding:5px 14px; border:none; border-radius:20px; cursor:pointer; font-weight:600; font-size:0.8rem; transition:0.2s; }
+    .btn-sm:hover { transform:scale(1.05); }
+    .btn-danger { background:#ef4444; color:white; }
+    .btn-danger:hover { background:#dc2626; }
+    .btn-primary { background:#7c3aed; color:white; }
+    .btn-primary:hover { background:#6d28d9; }
+
+    .flex-row { display:flex; gap:0.8rem; flex-wrap:wrap; align-items:center; margin-top:0.8rem; }
+    .flex-row input, .flex-row select { padding:8px 14px; background:rgba(8,6,28,0.8); border:1.5px solid #2a235a; border-radius:20px; color:#f0eeff; outline:none; flex:1; min-width:120px; }
+    .flex-row input:focus { border-color:#8b5cf6; }
+
+    @media (max-width:600px) {
+      .header { flex-direction:column; align-items:stretch; }
+      .header-info { justify-content:space-between; }
+      .admin-section { padding:1rem; }
+      .flex-row { flex-direction:column; }
+      .flex-row input { width:100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-container">
+  <div class="header">
+    <div class="brand" onclick="window.location.href='dashboard.html'">⚡ VoltX – Admin</div>
+    <div class="header-info">
+      <span class="admin-badge" id="adminName">👑 Admin</span>
+      <button class="btn-logout" id="logoutBtn">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div id="adminDashboard">
+    <div class="dashboard-grid" id="statsGrid">
+      <div class="stat-card"><div class="label">👥 User</div><div class="value" id="statUsers">0</div></div>
+      <div class="stat-card"><div class="label">🛒 Items</div><div class="value" id="statItems">0</div></div>
+      <div class="stat-card"><div class="label">🪙 Coins</div><div class="value" id="statCoins">0</div></div>
+      <div class="stat-card"><div class="label">👑 Admins</div><div class="value" id="statAdmins">1</div></div>
+      <div class="stat-card"><div class="label">📦 Käufe</div><div class="value" id="statPurchases">0</div></div>
+    </div>
+
+    <div class="admin-section">
+      <h3><span>👥</span> User verwalten</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Coins</th><th>Bio</th><th>Beigetreten</th><th>Aktionen</th></tr></thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+      <div class="flex-row">
+        <select id="coinUserSelect"></select>
+        <input type="number" id="coinAmount" placeholder="Betrag (+/-)" />
+        <button class="btn-sm btn-primary" id="coinChangeBtn">🪙 Coins ändern</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <h3><span>🛒</span> Shop verwalten</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Preis</th><th>Verkäufe</th><th>Aktionen</th></tr></thead>
+          <tbody id="shopTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+
+  function apiFetch(endpoint, options = {}) {
+    return fetch(`${API_URL}/admin${endpoint}`, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      }
+    }).then(res => {
+      if (res.status === 401 || res.status === 403) {
+        alert('❌ Keine Admin-Rechte!');
+        window.location.href = 'dashboard.html';
+        return Promise.reject('No admin rights');
+      }
+      return res.json();
+    });
+  }
+
+  async function loadDashboard() {
+    try {
+      const data = await apiFetch('/dashboard');
+      if (data.success) {
+        document.getElementById('statUsers').textContent = data.stats.totalUsers;
+        document.getElementById('statItems').textContent = data.stats.totalItems;
+        document.getElementById('statCoins').textContent = data.stats.totalCoins;
+        document.getElementById('statAdmins').textContent = data.stats.totalAdmins;
+        document.getElementById('statPurchases').textContent = data.stats.totalPurchases;
+      }
+      loadUsers();
+      loadShop();
+    } catch (err) {
+      console.error('Load Dashboard Error:', err);
+    }
+  }
+
+  async function loadUsers() {
+    try {
+      const data = await apiFetch('/users');
+      if (data.success) {
+        const tbody = document.getElementById('userTableBody');
+        const select = document.getElementById('coinUserSelect');
+        tbody.innerHTML = '';
+        select.innerHTML = '';
+        data.users.forEach(u => {
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${u.username}</strong></td>
+              <td>🪙 ${u.voltCoins}</td>
+              <td>${u.bio || 'Keine Bio'}</td>
+              <td>${new Date(u.createdAt).toLocaleDateString('de-DE')}</td>
+              <td>
+                <button class="btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑️ Löschen</button>
+              </td>
+            </tr>
+          `;
+          select.innerHTML += `<option value="${u.id}">${u.username} (${u.voltCoins})</option>`;
+        });
+      }
+    } catch (err) {
+      console.error('Load Users Error:', err);
+    }
+  }
+
+  window.deleteUser = async function(userId) {
+    if (!confirm('User wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!')) return;
+    try {
+      const data = await apiFetch(`/user/${userId}`, { method: 'DELETE' });
+      if (data.success) {
+        alert(data.message);
+        loadUsers();
+        loadDashboard();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('❌ Serverfehler.');
+    }
+  };
+
+  document.getElementById('coinChangeBtn').addEventListener('click', async () => {
+    const userId = document.getElementById('coinUserSelect').value;
+    const amount = parseInt(document.getElementById('coinAmount').value);
+
+    if (!userId) { alert('❌ Bitte User auswählen.'); return; }
+    if (isNaN(amount) || amount === 0) { alert('❌ Bitte gültigen Betrag eingeben.'); return; }
+
+    try {
+      const data = await apiFetch('/user/coins', {
+        method: 'POST',
+        body: JSON.stringify({ userId, amount })
+      });
+      if (data.success) {
+        alert(data.message);
+        loadUsers();
+        loadDashboard();
+        document.getElementById('coinAmount').value = '';
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('❌ Serverfehler.');
+    }
+  });
+
+  async function loadShop() {
+    try {
+      const data = await apiFetch('/items');
+      if (data.success) {
+        const tbody = document.getElementById('shopTableBody');
+        tbody.innerHTML = '';
+        data.items.forEach(item => {
+          const sales = item.boughtBy?.length || 0;
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${item.name}</strong></td>
+              <td>🪙 ${item.price}</td>
+              <td>${sales}</td>
+              <td>
+                <button class="btn-sm btn-danger" onclick="deleteItem('${item.id}')">🗑️ Löschen</button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+    } catch (err) {
+      console.error('Load Shop Error:', err);
+    }
+  }
+
+  window.deleteItem = async function(itemId) {
+    if (!confirm('Item wirklich löschen?')) return;
+    try {
+      const data = await apiFetch(`/item/${itemId}`, { method: 'DELETE' });
+      if (data.success) {
+        alert(data.message);
+        loadShop();
+        loadDashboard();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('❌ Serverfehler.');
+    }
+  };
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    window.location.href = 'login.html';
+  });
+
+  // Prüfen ob Admin
+  fetch(`${API_URL}/protected/dashboard`, {
+    credentials: 'include'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && data.user.username === 'LucaPicassu') {
+      loadDashboard();
+    } else {
+      alert('❌ Keine Admin-Rechte!');
+      window.location.href = 'dashboard.html';
+    }
+  })
+  .catch(() => {
+    window.location.href = 'login.html';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoltX – V$ Shop</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+    body {
+      min-height:100vh;
+      background: radial-gradient(circle at 30% 20%, #0e0b2a, #04030e);
+      padding:1.5rem;
+      color:#f0eeff;
+    }
+    .container {
+      max-width:1200px;
+      margin:0 auto;
+    }
+    .header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:1rem 2rem;
+      background:rgba(16,14,40,0.78);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(120,80,255,0.3);
+      border-radius:40px;
+      margin-bottom:2rem;
+      flex-wrap:wrap;
+      gap:1rem;
+    }
+    .brand { font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,#a78bfa,#7c3aed,#4f46e5); -webkit-background-clip:text; background-clip:text; color:transparent; cursor:pointer; }
+    .brand:hover { opacity:0.8; }
+    .user-area { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
+    .user-name { font-weight:600; color:#c4b5fd; }
+    .coins-badge { background:rgba(124,58,237,0.2); padding:6px 16px; border-radius:40px; border:1px solid #7c3aed; font-weight:700; color:#a78bfa; }
+    .btn-logout { background:#ef4444; border:none; color:white; padding:8px 20px; border-radius:40px; cursor:pointer; font-weight:600; transition:0.25s; }
+    .btn-logout:hover { background:#dc2626; transform:scale(1.05); }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      color: #a78bfa;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 40px;
+      background: rgba(124, 58, 237, 0.15);
+      border: 1px solid #4f46e5;
+      transition: 0.25s;
+    }
+    .nav-links a:hover {
+      background: #7c3aed;
+      color: white;
+      box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+    }
+    .nav-links a.active {
+      background: #7c3aed;
+      color: white;
+    }
+
+    .content {
+      background: rgba(10, 8, 30, 0.4);
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid #1a1540;
+    }
+    .content h3 {
+      color: #a78bfa;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-container {
+      background: rgba(10, 8, 30, 0.6);
+      border-radius: 20px;
+      padding: 1.5rem;
+      border: 1px solid #2a235a;
+      margin-bottom: 2rem;
+    }
+    .search-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-row input,
+    .search-row select {
+      padding: 10px 16px;
+      background: rgba(8, 6, 28, 0.8);
+      border: 1.5px solid #2a235a;
+      border-radius: 32px;
+      color: #f0eeff;
+      font-size: 0.95rem;
+      outline: none;
+      flex: 1;
+      min-width: 150px;
+    }
+    .search-row input:focus,
+    .search-row select:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+    }
+    .search-row input::placeholder {
+      color: #5a5090;
+    }
+    .search-row select option {
+      background: #0e0b2a;
+    }
+    .search-row .btn-search {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: none;
+      color: white;
+      padding: 10px 28px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.25s;
+      white-space: nowrap;
+    }
+    .search-row .btn-search:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
+    }
+    .search-row .btn-reset {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 10px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.25s;
+      white-space: nowrap;
+    }
+    .search-row .btn-reset:hover {
+      background: #ef4444;
+      color: white;
+    }
+    .search-stats {
+      color: #9ca3cf;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+    }
+    .search-stats strong {
+      color: #a78bfa;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .shop-item {
+      background: rgba(10, 8, 30, 0.7);
+      border: 1px solid #2a235a;
+      border-radius: 28px;
+      padding: 1.5rem 1.2rem;
+      text-align: center;
+      color: #f0eeff;
+      transition: 0.25s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .shop-item:hover {
+      border-color: #7c3aed;
+      transform: scale(1.03);
+      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15);
+    }
+    .shop-item h4 {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+    .shop-item .price {
+      color: #a78bfa;
+      font-weight: 700;
+      margin: 8px 0;
+      font-size: 1rem;
+    }
+    .shop-item .description {
+      font-size: 0.85rem;
+      color: #c4b5fd;
+      margin: 8px 0;
+      line-height: 1.4;
+      background: rgba(0,0,0,0.3);
+      padding: 8px 12px;
+      border-radius: 16px;
+      flex-grow: 1;
+    }
+    .shop-item .virus-link {
+      font-size: 0.75rem;
+      color: #9ca3cf;
+      margin-top: 6px;
+    }
+    .shop-item .virus-link a {
+      color: #a78bfa;
+      text-decoration: none;
+    }
+    .shop-item .download-count {
+      font-size: 0.8rem;
+      color: #34d399;
+      margin-top: 4px;
+    }
+    .download-btn {
+      background: #34d399;
+      border: none;
+      color: #0e0b2a;
+      padding: 7px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s;
+      margin-top: 8px;
+    }
+    .download-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 25px rgba(52, 211, 153, 0.4);
+    }
+    .shop-item button:not(.download-btn) {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: none;
+      color: white;
+      padding: 7px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: 0.2s;
+      margin-top: 8px;
+    }
+    .shop-item button:not(.download-btn):hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
+    }
+    .shop-item button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      color: #9ca3cf;
+      padding: 3rem 0;
+      font-size: 1.1rem;
+    }
+
+    @media (max-width:600px) {
+      .header { flex-direction:column; align-items:stretch; }
+      .user-area { justify-content:space-between; }
+      .nav-links a { padding:6px 14px; font-size:0.85rem; }
+      .content { padding:1rem; }
+      .shop-grid { grid-template-columns:1fr; }
+      .search-row { flex-direction:column; }
+      .search-row input, .search-row select { width:100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="brand" onclick="window.location.href='dashboard.html'">⚡ VoltX</div>
+    <div class="user-area">
+      <span class="user-name" id="userName">Laden...</span>
+      <span class="coins-badge" id="userCoins">🪙 0</span>
+      <button class="btn-logout" id="logoutBtn">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="shop.html" class="active">🛒 V$ Shop</a>
+    <a href="upload.html">📤 Upload</a>
+    <a href="members.html">👥 Member</a>
+    <a href="profile.html">👤 Profil</a>
+  </div>
+
+  <div class="content">
+    <h3>🛒 V$ Shop</h3>
+
+    <div class="search-container">
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="🔍 Item suchen..." />
+        <input type="number" id="minPriceInput" placeholder="Min Preis" min="0" />
+        <input type="number" id="maxPriceInput" placeholder="Max Preis" min="0" />
+        <select id="sortSelect">
+          <option value="newest">🕐 Neueste</option>
+          <option value="price_asc">💰 Preis aufsteigend</option>
+          <option value="price_desc">💰 Preis absteigend</option>
+          <option value="name_asc">🔤 Name A-Z</option>
+          <option value="name_desc">🔤 Name Z-A</option>
+          <option value="popular">⭐ Beliebteste</option>
+        </select>
+        <button class="btn-search" id="searchBtn">🔍 Suchen</button>
+        <button class="btn-reset" id="resetBtn">✖ Zurücksetzen</button>
+      </div>
+      <div class="search-stats" id="searchStats">📦 <strong id="resultCount">0</strong> Items gefunden</div>
+    </div>
+
+    <div class="shop-grid" id="shopGrid">
+      <p style="color:#9ca3cf; grid-column:1/-1; text-align:center;">⏳ Lade Shop...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+  let currentUser = null;
+  let shopItems = [];
+  let searchTimeout = null;
+
+  function apiFetch(endpoint, options = {}) {
+    return fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      }
+    }).then(res => {
+      if (res.status === 401) {
+        window.location.href = 'login.html';
+        return Promise.reject('Unauthorized');
+      }
+      return res.json();
+    });
+  }
+
+  async function loadUser() {
+    try {
+      const data = await apiFetch('/protected/dashboard');
+      if (data.success) {
+        currentUser = data.user;
+        document.getElementById('userName').textContent = data.user.username;
+        document.getElementById('userCoins').innerHTML = `🪙 ${data.user.voltCoins}`;
+        loadShop();
+      }
+    } catch (err) {
+      console.error('Load User Error:', err);
+      window.location.href = 'login.html';
+    }
+  }
+
+  async function loadShop(searchParams = null) {
+    try {
+      let url = '/shop/search?';
+      if (searchParams) {
+        if (searchParams.q) url += `q=${encodeURIComponent(searchParams.q)}&`;
+        if (searchParams.minPrice) url += `minPrice=${searchParams.minPrice}&`;
+        if (searchParams.maxPrice) url += `maxPrice=${searchParams.maxPrice}&`;
+        if (searchParams.sort) url += `sort=${searchParams.sort}&`;
+      }
+      if (url === '/shop/search?') {
+        url = '/shop/items';
+        const data = await apiFetch(url);
+        if (data.success) {
+          shopItems = data.items;
+          renderShop(shopItems);
+          document.getElementById('resultCount').textContent = shopItems.length;
+        }
+        return;
+      }
+
+      const data = await apiFetch(url);
+      if (data.success) {
+        shopItems = data.items;
+        renderShop(shopItems);
+        document.getElementById('resultCount').textContent = data.totalResults || shopItems.length;
+      }
+    } catch (err) {
+      console.error('Shop Load Error:', err);
+      document.getElementById('shopGrid').innerHTML =
+        `<p style="color:#fca5a5; grid-column:1/-1; text-align:center;">❌ Fehler beim Laden des Shops.</p>`;
+    }
+  }
+
+  function renderShop(items) {
+    const grid = document.getElementById('shopGrid');
+    
+    if (!items || items.length === 0) {
+      grid.innerHTML = `
+        <div class="no-results">
+          🔍 Keine Items gefunden.<br />
+          <span style="font-size:0.85rem;color:#6b6190;">Versuche es mit einem anderen Suchbegriff.</span>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = items.map(item => {
+      const isOwner = item.createdBy === currentUser?.id;
+      const hasBought = item.boughtBy && item.boughtBy.includes(currentUser?.id);
+      const downloadCount = item.downloadCount || 0;
+
+      let actionButton = '';
+      if (hasBought) {
+        actionButton = `<button class="download-btn" onclick="downloadItem('${item.id}')">⬇️ Download</button>`;
+      } else if (isOwner) {
+        actionButton = `<button disabled style="opacity:0.5;cursor:not-allowed;">Eigenes Item</button>`;
+      } else {
+        actionButton = `<button onclick="buyItem('${item.id}')">Kaufen</button>`;
+      }
+
+      return `
+        <div class="shop-item" data-id="${item.id}">
+          <h4>${item.name}</h4>
+          <div class="price">🪙 ${item.price}</div>
+          <div class="download-count">⬇️ ${downloadCount} Mal heruntergeladen</div>
+          <div class="description">📝 ${item.description || 'Keine Beschreibung'}</div>
+          <div class="virus-link">🔗 <a href="${item.virusTotalLink}" target="_blank">VirusTotal-Prüfung</a></div>
+          <div>${actionButton}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function performSearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    const minPrice = document.getElementById('minPriceInput').value.trim();
+    const maxPrice = document.getElementById('maxPriceInput').value.trim();
+    const sort = document.getElementById('sortSelect').value;
+
+    const params = {};
+    if (q) params.q = q;
+    if (minPrice && !isNaN(minPrice)) params.minPrice = minPrice;
+    if (maxPrice && !isNaN(maxPrice)) params.maxPrice = maxPrice;
+    if (sort) params.sort = sort;
+
+    loadShop(params);
+  }
+
+  function resetSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('minPriceInput').value = '';
+    document.getElementById('maxPriceInput').value = '';
+    document.getElementById('sortSelect').value = 'newest';
+    loadShop(null);
+  }
+
+  window.buyItem = async function(itemId) {
+    if (!currentUser) return alert('Bitte einloggen.');
+    const item = shopItems.find(i => i.id === itemId);
+    if (!item) return alert('Item nicht gefunden.');
+    if (currentUser.voltCoins < item.price) {
+      return alert(`❌ Nicht genügend Coins. Du hast ${currentUser.voltCoins}.`);
+    }
+    if (item.createdBy === currentUser.id) {
+      return alert('❌ Du kannst dein eigenes Item nicht kaufen.');
+    }
+    if (!confirm(`${item.name} für ${item.price} Coins kaufen?`)) return;
+
+    try {
+      const data = await apiFetch('/shop/buy', {
+        method: 'POST',
+        body: JSON.stringify({ itemId })
+      });
+      if (data.success) {
+        alert(data.message);
+        currentUser.voltCoins = data.remainingCoins;
+        document.getElementById('userCoins').innerHTML = `🪙 ${data.remainingCoins}`;
+        const itemIndex = shopItems.findIndex(i => i.id === itemId);
+        if (itemIndex !== -1) {
+          if (!shopItems[itemIndex].boughtBy) shopItems[itemIndex].boughtBy = [];
+          shopItems[itemIndex].boughtBy.push(currentUser.id);
+          shopItems[itemIndex].downloadCount = (shopItems[itemIndex].downloadCount || 0) + 1;
+        }
+        renderShop(shopItems);
+      } else {
+        alert(data.message || 'Kauf fehlgeschlagen.');
+      }
+    } catch (err) {
+      alert('❌ Serverfehler: ' + err.message);
+    }
+  };
+
+  window.downloadItem = function(itemId) {
+    const item = shopItems.find(i => i.id === itemId);
+    if (item && item.boughtBy && item.boughtBy.includes(currentUser?.id)) {
+      window.open(item.downloadLink, '_blank');
+    } else {
+      alert('❌ Du hast dieses Item nicht gekauft.');
+    }
+  };
+
+  document.getElementById('searchBtn').addEventListener('click', performSearch);
+  document.getElementById('resetBtn').addEventListener('click', resetSearch);
+
+  document.getElementById('searchInput').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') performSearch();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      performSearch();
+    }, 500);
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    window.location.href = 'login.html';
+  });
+
+  if (!document.cookie.includes('token')) {
+    window.location.href = 'login.html';
+  } else {
+    loadUser();
+  }
+</script>
+</body>
+</html>
